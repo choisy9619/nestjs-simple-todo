@@ -26,6 +26,7 @@ import {
 } from '@nestjs/swagger';
 import { TodoDto } from './dto/todo-dto';
 import { ResponseDto } from './dto/response.dto';
+import { GenericApiResponse } from './decorators/generic-api-response-decorator';
 
 @ApiTags('todos')
 @ApiExtraModels(ResponseDto)
@@ -37,35 +38,14 @@ export class TodosController {
   @Post()
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Todo created successfully')
-  // @ApiBearerAuth()
-  // @ApiHeader({
-  //   name: 'X-MyHeader',
-  //   description: 'Custom header',
-  // })
-  // @ApiOkResponse({
-  //   description: '### Todo has been successfully created.',
-  //   type: TodoDto,
-  // })
   @ApiResponse({
     status: 999,
     description: '.',
     type: TodoDto,
   })
-  @ApiResponse({
-    status: 200,
+  @GenericApiResponse({
+    model: TodoDto,
     description: '### Todo has been successfully created.',
-    schema: {
-      allOf: [
-        { $ref: getSchemaPath(ResponseDto) },
-        {
-          properties: {
-            data: {
-              $ref: getSchemaPath(TodoDto),
-            },
-          },
-        },
-      ],
-    },
   })
   @ApiResponse({ status: 403, description: '### Forbidden.' })
   @ApiOperation({
@@ -85,22 +65,10 @@ export class TodosController {
   @Get()
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Todos fetched successfully')
-  @ApiResponse({
-    status: 200,
-    description: '### Todos have been successfully fetched.',
-    schema: {
-      allOf: [
-        { $ref: getSchemaPath(ResponseDto) },
-        {
-          properties: {
-            data: {
-              type: 'array',
-              items: { $ref: getSchemaPath(TodoDto) },
-            },
-          },
-        },
-      ],
-    },
+  @GenericApiResponse({
+    model: TodoDto,
+    description: '### Todos have been successfully founded.',
+    isArray: true,
   })
   @ApiResponse({ status: 403, description: '### Forbidden.' })
   @ApiOperation({
@@ -119,25 +87,9 @@ export class TodosController {
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Todo founded successfully')
-  // @ApiOkResponse({
-  //   description: '### Todo has been successfully fetched.',
-  //   type: TodoDto,
-  // })
-  @ApiResponse({
-    status: 200,
-    description: '### Todo has been successfully fetched.',
-    schema: {
-      allOf: [
-        { $ref: getSchemaPath(ResponseDto) },
-        {
-          properties: {
-            data: {
-              $ref: getSchemaPath(TodoDto),
-            },
-          },
-        },
-      ],
-    },
+  @GenericApiResponse({
+    model: TodoDto,
+    description: '### Todo has been successfully founded.',
   })
   @ApiResponse({ status: 403, description: '### Forbidden.' })
   @ApiOperation({
@@ -162,25 +114,9 @@ export class TodosController {
   @Post(':id')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Todo updated successfully')
-  // @ApiOkResponse({
-  //   description: '### Todo has been successfully updated.',
-  //   type: TodoDto,
-  // })
-  @ApiResponse({
-    status: 200,
+  @GenericApiResponse({
+    model: TodoDto,
     description: '### Todo has been successfully updated.',
-    schema: {
-      allOf: [
-        { $ref: getSchemaPath(ResponseDto) },
-        {
-          properties: {
-            data: {
-              $ref: getSchemaPath(TodoDto),
-            },
-          },
-        },
-      ],
-    },
   })
   @ApiResponse({ status: 403, description: '### Forbidden.' })
   @ApiOperation({
@@ -205,25 +141,9 @@ export class TodosController {
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
   @ResponseMessage('Todo deleted successfully')
-  // @ApiOkResponse({
-  //   description: '### Todo has been successfully deleted.',
-  //   type: TodoDto,
-  // })
-  @ApiResponse({
-    status: 200,
+  @GenericApiResponse({
+    model: TodoDto,
     description: '### Todo has been successfully deleted.',
-    schema: {
-      allOf: [
-        { $ref: getSchemaPath(ResponseDto) },
-        {
-          properties: {
-            data: {
-              $ref: getSchemaPath(TodoDto),
-            },
-          },
-        },
-      ],
-    },
   })
   @ApiResponse({ status: 403, description: '### Forbidden.' })
   @ApiOperation({
