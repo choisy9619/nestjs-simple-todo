@@ -1,66 +1,44 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Param,
+  Controller,
   Delete,
-  ParseIntPipe,
+  Get,
   HttpCode,
-  HttpStatus,
-  Res,
   HttpException,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Post,
+  UseInterceptors,
 } from '@nestjs/common';
 import { TodosService } from './todos.service';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
-import { Response } from 'express';
+import { ResponseMessage } from './decorators/response-message-decorator';
+import { ResponseTransformInterceptor } from './interceptors/response-transform-interceptor';
 
-// 서버루트/todos
 @Controller('todos')
+@UseInterceptors(ResponseTransformInterceptor)
 export class TodosController {
   constructor(private readonly todosService: TodosService) {}
 
-  // @Post()
-  // @HttpCode(HttpStatus.OK)
-  // create(@Body() createTodoDto: CreateTodoDto) {
-  //   return this.todosService.create(createTodoDto);
-  // }
-
-  // @Post()
-  // async create(@Body() createTodoDto: CreateTodoDto, @Res() res: Response) {
-  //   const createdTodo = await this.todosService.create(createTodoDto);
-  //   res.status(HttpStatus.OK).json({
-  //     message: 'Todo created successfully',
-  //     statusCode: 200,
-  //     data: createdTodo,
-  //   });
-  // }
-
   @Post()
   @HttpCode(HttpStatus.OK)
+  @ResponseMessage('Todo created successfully')
   async create(@Body() createTodoDto: CreateTodoDto) {
-    const createdTodo = await this.todosService.create(createTodoDto);
-    return {
-      message: 'Todo created successfully',
-      statusCode: 200,
-      data: createdTodo,
-    };
+    return await this.todosService.create(createTodoDto);
   }
 
   @Get()
   @HttpCode(HttpStatus.OK)
+  @ResponseMessage('Todos fetched successfully')
   async findAll() {
-    const fetchedTodos = await this.todosService.findAll();
-    return {
-      message: 'Todos fetched successfully',
-      statusCode: 200,
-      data: fetchedTodos,
-    };
+    return await this.todosService.findAll();
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
+  @ResponseMessage('Todo founded successfully')
   async findOne(@Param('id', ParseIntPipe) id: number) {
     const foundTodo = await this.todosService.findOne(+id);
 
@@ -68,15 +46,12 @@ export class TodosController {
       throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
     }
 
-    return {
-      message: 'Todo founded successfully',
-      statusCode: 200,
-      data: foundTodo,
-    };
+    return foundTodo;
   }
 
   @Post(':id')
   @HttpCode(HttpStatus.OK)
+  @ResponseMessage('Todo updated successfully')
   async update(@Param('id') id: string, @Body() updateTodoDto: UpdateTodoDto) {
     const foundTodo = await this.todosService.findOne(+id);
 
@@ -84,17 +59,12 @@ export class TodosController {
       throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
     }
 
-    const updatedTodo = await this.todosService.update(+id, updateTodoDto);
-
-    return {
-      message: 'Todo updated successfully',
-      statusCode: 200,
-      data: updatedTodo,
-    };
+    return await this.todosService.update(+id, updateTodoDto);
   }
 
   @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @HttpCode(HttpStatus.OK)
+  @ResponseMessage('Todo deleted successfully')
   async remove(@Param('id') id: string) {
     const foundTodo = await this.todosService.findOne(+id);
 
@@ -102,12 +72,6 @@ export class TodosController {
       throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
     }
 
-    const deletedTodo = await this.todosService.remove(+id);
-
-    return {
-      message: 'Todo founded successfully',
-      statusCode: 204,
-      data: deletedTodo,
-    };
+    return await this.todosService.remove(+id);
   }
 }
